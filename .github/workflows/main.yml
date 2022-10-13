@@ -1,0 +1,100 @@
+name: CI/CD
+
+on:
+  push:
+  pull_request:
+
+env:
+  PROJECT_NAME: stable-diffusion-webservice
+  DOCKER_IMAGE: ghcr.io/${{ github.repository }}/${{ github.event.repository.name }}
+  DOCKER_TAG: ${{ github.sha }}
+  SERVER_PORT: 1091
+
+jobs:
+  deploy-test:
+    runs-on: ubuntu-20.04
+    if: github.ref == 'refs/heads/main'
+    concurrency: deploy-test
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Create .env file
+        uses: noi-techpark/github-actions/env-file@v2
+        env:
+          X_COMPOSE_PROJECT_NAME: ${{ env.PROJECT_NAME }}
+          X_DOCKER_IMAGE: ${{ env.DOCKER_IMAGE }}
+          X_DOCKER_TAG: ${{ env.DOCKER_TAG }}
+          X_SERVER_PORT: ${{ env.SERVER_PORT }}
+
+      - name: Build go application
+        uses: actions/setup-go@v3
+        with:
+          go-version: '^1.17.6'
+        run: go build noi-sd-ws
+
+      - name: Setup database
+        run: |
+          sqlite3 queue.db ".read initialize-db.sql"
+          sqlite3 queue.db "update secrets set secret = '${{ secrets.HCAPTCHA_SECRET }}' where kind = 'hcaptcha_secret'";
+          sqlite3 queue.db "update secrets set secret = '${{ secrets.HCAPTCHA_SITEKEY }} where kind = 'hcaptcha_sitekey'";
+          sqlite3 queue.db "update secrets set secret = '${{ secrets.BACKEND_SECRET }}' where kind = 'backend_secret'";
+
+      - name: Build and push 
+        uses: noi-techpark/github-actions/docker-build-and-push@v2
+        with:
+          docker-username: ${{ github.actor }}
+          docker-password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Deploy application
+        uses: noi-techpark/github-actions/docker-deploy@v2
+        with:
+          hosts: 'test'
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          docker-username: 'noi-techpark-bot'
+          docker-password: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          project-name: ${{ env.PROJECT_NAME }}
+
+  deploy-prod:
+    runs-on: ubuntu-20.04
+    if: github.ref == 'refs/heads/prod'
+    concurrency: deploy-prod
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Create .env file
+        uses: noi-techpark/github-actions/env-file@v2
+        env:
+          X_DOCKER_PROJECT_NAME: ${{ env.PROJECT_NAME }}
+          X_DOCKER_IMAGE: ${{ env.DOCKER_IMAGE }}
+          X_DOCKER_TAG: ${{ env.DOCKER_TAG }}
+          X_SERVER_PORT: ${{ env.SERVER_PORT }}
+
+      - name: Build go application
+        uses: actions/setup-go@v3
+        with:
+          go-version: '^1.17.6'
+        run: go build noi-sd-ws
+
+      - name: Setup database
+        run: |
+          sqlite3 queue.db ".read initialize-db.sql"
+          sqlite3 queue.db "update secrets set secret = '${{ secrets.HCAPTCHA_SECRET }}' where kind = 'hcaptcha_secret'";
+          sqlite3 queue.db "update secrets set secret = '${{ secrets.HCAPTCHA_SITEKEY }} where kind = 'hcaptcha_sitekey'";
+          sqlite3 queue.db "update secrets set secret = '${{ secrets.BACKEND_SECRET }}' where kind = 'backend_secret'";
+
+      - name: Build and push 
+        uses: noi-techpark/github-actions/docker-build-and-push@v2
+        with:
+          docker-username: ${{ github.actor }}
+          docker-password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Deploy application
+        uses: noi-techpark/github-actions/docker-deploy@v2
+        with:
+          hosts: 'prod'
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          docker-username: 'noi-techpark-bot'
+          docker-password: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          project-name: ${{ env.PROJECT_NAME }}
