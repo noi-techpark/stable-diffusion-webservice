@@ -19,6 +19,11 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v3
 
+      - name: Setup go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '^1.17.6'
+
       - name: Create .env file
         uses: noi-techpark/github-actions/env-file@v2
         env:
@@ -28,9 +33,6 @@ jobs:
           X_SERVER_PORT: ${{ env.SERVER_PORT }}
 
       - name: Build go application
-        uses: actions/setup-go@v3
-        with:
-          go-version: '^1.17.6'
         run: go build noi-sd-ws
 
       - name: Setup database
@@ -63,18 +65,20 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v3
 
+      - name: Setup go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '^1.17.6'
+
       - name: Create .env file
         uses: noi-techpark/github-actions/env-file@v2
         env:
-          X_DOCKER_PROJECT_NAME: ${{ env.PROJECT_NAME }}
+          X_COMPOSE_PROJECT_NAME: ${{ env.PROJECT_NAME }}
           X_DOCKER_IMAGE: ${{ env.DOCKER_IMAGE }}
           X_DOCKER_TAG: ${{ env.DOCKER_TAG }}
           X_SERVER_PORT: ${{ env.SERVER_PORT }}
 
       - name: Build go application
-        uses: actions/setup-go@v3
-        with:
-          go-version: '^1.17.6'
         run: go build noi-sd-ws
 
       - name: Setup database
