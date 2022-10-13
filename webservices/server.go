@@ -15,7 +15,7 @@ spawn web services
 */
 func Spawn() {
 
-	const ADDRESS = "127.0.0.1:9090"
+	const ADDRESS = "0.0.0.0:9090"
 
 	mux := http.NewServeMux()
 
