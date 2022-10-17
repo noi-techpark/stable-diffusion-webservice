@@ -8,6 +8,4 @@ services:
     ports:
       - 8999:9090
     volumes: 
-      - type: bind
-        source: ./queue.db
-        target: /queue.db
+      - ./queue.db:/go/app/queue.db

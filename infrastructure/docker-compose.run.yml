@@ -8,6 +8,4 @@ services:
     ports:
       - "${SERVER_PORT}:9090"
     volumes: 
-      - type: bind
-        source: ../../shared/queue.db
-        target: /queue.db
+      - ../../shared/queue.db:/go/app/queue.db
