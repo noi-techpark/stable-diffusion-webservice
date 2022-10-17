@@ -9,5 +9,5 @@ services:
       - "${SERVER_PORT}:9090"
     volumes: 
       - type: bind
-        source: ../shared/queue.db
+        source: ../../shared/queue.db
         target: /queue.db
