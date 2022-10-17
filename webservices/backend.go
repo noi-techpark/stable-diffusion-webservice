@@ -35,7 +35,7 @@ func getNextJob(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// open DB, get job
+	// open DB, check secret and get job
 
 	db, err := sql.Open("sqlite3", DBName)
 	defer db.Close()
@@ -45,7 +45,27 @@ func getNextJob(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	st, err := db.Prepare("select token, number, width, height, prompt from jobs where state = 'new' order by created_ms limit 1")
+	st, err := db.Prepare("select count(*) as cnt from secrets where kind = 'backend_secret' and secret = ?")
+	defer st.Close()
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(res, "\"cannot query database\"\n")
+		return
+	}
+	var cnt int64
+	err = st.QueryRow(secret).Scan(&cnt)
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(res, "\"cannot retrieve query results\"\n")
+		return
+	}
+	if cnt < 1 {
+		res.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(res, "\"wrong secret\"\n")
+		return
+	}
+
+	st, err = db.Prepare("select token, number, width, height, prompt from jobs where state = 'new' order by created_ms limit 1")
 	defer st.Close()
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
@@ -118,7 +138,7 @@ func setJobStatus(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// open DB, check current state, apply new state
+	// open DB, check secret and current state, apply new state
 
 	db, err := sql.Open("sqlite3", DBName)
 	defer db.Close()
@@ -128,7 +148,27 @@ func setJobStatus(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	st, err := db.Prepare("select state from jobs j where token = ?")
+	st, err := db.Prepare("select count(*) as cnt from secrets where kind = 'backend_secret' and secret = ?")
+	defer st.Close()
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(res, "\"cannot query database\"\n")
+		return
+	}
+	var cnt int64
+	err = st.QueryRow(secret).Scan(&cnt)
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(res, "\"cannot retrieve query results\"\n")
+		return
+	}
+	if cnt < 1 {
+		res.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(res, "\"wrong secret\"\n")
+		return
+	}
+
+	st, err = db.Prepare("select state from jobs j where token = ?")
 	defer st.Close()
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
