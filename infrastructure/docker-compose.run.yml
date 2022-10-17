@@ -8,4 +8,4 @@ services:
     ports:
       - "${SERVER_PORT}:9090"
     volumes: 
-      - ../../shared/queue.db:/go/app/queue.db
+      - ../shared/queue.db:/go/app/queue.db
