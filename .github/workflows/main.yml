@@ -35,13 +35,6 @@ jobs:
       - name: Build go application
         run: go build noi-sd-ws
 
-      - name: Setup database
-        run: |
-          sqlite3 queue.db ".read initialize-db.sql"
-          sqlite3 queue.db "update secrets set secret = '${{ secrets.HCAPTCHA_SECRET }}' where kind = 'hcaptcha_secret'";
-          sqlite3 queue.db "update secrets set secret = '${{ secrets.HCAPTCHA_SITEKEY }}' where kind = 'hcaptcha_sitekey'";
-          sqlite3 queue.db "update secrets set secret = '${{ secrets.BACKEND_SECRET }}' where kind = 'backend_secret'";
-
       - name: Build and push 
         uses: noi-techpark/github-actions/docker-build-and-push@v2
         with:
@@ -80,13 +73,6 @@ jobs:
 
       - name: Build go application
         run: go build noi-sd-ws
-
-      - name: Setup database
-        run: |
-          sqlite3 queue.db ".read initialize-db.sql"
-          sqlite3 queue.db "update secrets set secret = '${{ secrets.HCAPTCHA_SECRET }}' where kind = 'hcaptcha_secret'";
-          sqlite3 queue.db "update secrets set secret = '${{ secrets.HCAPTCHA_SITEKEY }}' where kind = 'hcaptcha_sitekey'";
-          sqlite3 queue.db "update secrets set secret = '${{ secrets.BACKEND_SECRET }}' where kind = 'backend_secret'";
 
       - name: Build and push 
         uses: noi-techpark/github-actions/docker-build-and-push@v2

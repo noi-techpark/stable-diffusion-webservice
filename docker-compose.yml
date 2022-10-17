@@ -1,4 +1,4 @@
-version: '3'
+version: '3.7'
 
 services:
   app:
@@ -7,3 +7,7 @@ services:
       dockerfile: ./infrastructure/docker/Dockerfile
     ports:
       - 8999:9090
+    volumes: 
+      - type: bind
+        source: ./queue.db
+        target: /queue.db
