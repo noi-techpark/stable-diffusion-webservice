@@ -86,6 +86,12 @@ $ ./noi-sd-ws queue.db
 The service will listen to the address defined in `webservices/server.go`
 (see constant ADDRESS) and log to stdout.
 
+## Deployment with Docker and Github Actions
+
+This section is only important for NOI developers using the docker-server as infrastructure.
+First create the database `queue.db` in the shared directory of the application on the docker server with the steps mentioned before.
+Then the application can be deployed and executed using the Github Action.
+
 ## Endpoints for the frontend
 
 ### /addJob
