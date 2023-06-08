@@ -22,9 +22,6 @@ env:
 #       - name: Checkout source code
 #         uses: actions/checkout@v3
 
-#       - name: REUSE Compliance Check
-#         uses: fsfe/reuse-action@v1
-
 #       - name: Setup go
 #         uses: actions/setup-go@v3
 #         with:
