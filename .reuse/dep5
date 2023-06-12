@@ -3,6 +3,6 @@ Upstream-Name: stable-diffusion-webservice
 Upstream-Contact: NOI Techpark <digital@noi.bz.it>
 Source: https://github.com/noi-techpark/stable-diffusion-webservice
 
-Files: .github/* infrastructure/* samples/* .gitignore LICENSE go.mod go.sum
+Files: .github/* infrastructure/* .pre-commit-config.yaml samples/* .gitignore LICENSE go.mod go.sum
 Copyright: (c) NOI Techpark <digital@noi.bz.it>
 License: CC0-1.0
