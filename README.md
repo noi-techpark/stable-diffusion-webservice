@@ -6,7 +6,7 @@ SPDX-License-Identifier: CC0-1.0
 
 # Stable Diffusion Webservice
 
-![REUSE Compliance](https://github.com/noi-techpark/stable-diffusion-webservice/actions/workflows/reuse.yml/badge.svg)
+[![REUSE Compliance](https://github.com/noi-techpark/stable-diffusion-webservice/actions/workflows/reuse.yml/badge.svg)](https://github.com/noi-techpark/odh-docs/wiki/REUSE#badges)
 
 (C) 2022 NOI SPA
 
